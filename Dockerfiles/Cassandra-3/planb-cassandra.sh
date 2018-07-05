@@ -119,5 +119,9 @@ if [ -n "$DC_SUFFIX" ]; then
     echo "dc_suffix=$DC_SUFFIX" > /etc/cassandra/cassandra-rackdc.properties
 fi
 
+# Initialze the script to dump all the token belong to this node in the ring.
+mkdir -p ${CASSANDRA_DATA_DIR}/metadata
+nohup /usr/local/bin/dump-ring-token.sh > ${CASSANDRA_DATA_DIR}/metadata/ring-tokens &
+
 echo "Starting Cassandra ..."
 exec /usr/sbin/cassandra -R -f

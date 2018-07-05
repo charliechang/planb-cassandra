@@ -8,11 +8,12 @@ EXPOSE 7001 7199 8778 9042
 ENV CASSIE_VERSION=3.11.2
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | tee -a /etc/apt/sources.list.d/apache.cassandra.list
+RUN apt-get update && apt-get -y install gnupg
 RUN curl https://www.apache.org/dist/cassandra/KEYS | apt-key add -
+RUN echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | tee -a /etc/apt/sources.list.d/apache.cassandra.list
 
 RUN apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confold' --fix-missing dist-upgrade
-RUN apt-get -y install vim less sysstat \
+RUN apt-get -y install vim less sysstat netcat \
     cassandra=$CASSIE_VERSION \
     cassandra-tools=$CASSIE_VERSION && \
     apt-get clean && \
@@ -38,6 +39,7 @@ RUN rm -f /etc/cassandra/cassandra.yaml \
           /etc/cassandra/cassandra-rackdc.properties && \
     chmod 0777 /etc/cassandra
 
+COPY dump-ring-token.sh  /usr/local/bin/
 COPY planb-cassandra.sh /usr/local/bin/
 
 ENV HOME=/var/lib/cassandra
